@@ -1,4 +1,5 @@
 const cv = require('opencv.js');
+var AR = require('js-aruco').AR;
 
 const video = document.getElementById('video');
 const width = 1900;
@@ -11,6 +12,8 @@ let grayMat = new cv.Mat(height, width, cv.CV_8UC1);
 let circlesMat = new cv.Mat();
 
 const cap = new cv.VideoCapture(video);
+
+var detector = new AR.Detector();
 
 export default function capture(callback) {
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
@@ -25,26 +28,25 @@ export default function capture(callback) {
   function processVideo () {
     const begin = Date.now();
 
-    cap.read(srcMat);
+    var canvas = document.getElementById("markersCanvas");
+    var context = canvas.getContext("2d");
 
-    cv.cvtColor(srcMat, grayMat, cv.COLOR_RGBA2GRAY);
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
-    let displayMat = new cv.Mat(height, width, cv.CV_8UC4, cv.Scalar.all(0));
+    var markers = detector.detect(imageData);
 
-    cv.HoughCircles(grayMat, circlesMat, cv.HOUGH_GRADIENT, 1, 45, 75, 40, 0, 0);
-
+    console.log({markers});
     const nodes = [];
-    for (let i = 0; i < circlesMat.cols; ++i) {
-        let x = circlesMat.data32F[i * 3];
-        let y = circlesMat.data32F[i * 3 + 1];
-        let radius = circlesMat.data32F[i * 3 + 2];
-
-        nodes.push({x, y, radius});
-
+    for(let i=0; i < markers.length; i++) {
+      const m = markers[i];
+      for(let j=0; j < m.corners.length; j++) {
+        nodes.push({x: m.corners[j].x, y: m.corners[j].y} )
+      }
     }
+    console.log({nodes});
 
     callback(nodes);
-
 
     const delay = 1000/FPS - (Date.now() - begin);
     setTimeout(processVideo, delay);

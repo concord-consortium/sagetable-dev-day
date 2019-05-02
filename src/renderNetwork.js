@@ -1,4 +1,4 @@
-var canvas = document.getElementById("canvasOutput");
+var canvas = document.getElementById("outputCanvas");
 var ctx = canvas.getContext("2d");
 
 export default function renderNetwork(nodes) {
@@ -9,7 +9,7 @@ export default function renderNetwork(nodes) {
 function drawNodes(nodes) {
   ctx.strokeStyle = "#FF0000";
   nodes.forEach(node => {
-    const width = node.radius * 2;
-    ctx.strokeRect(node.x - node.radius, node.y - node.radius, width, width);
+    const width = 10;
+    ctx.strokeRect(node.x, node.y, width, width);
   });
 }

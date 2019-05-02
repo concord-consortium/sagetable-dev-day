@@ -2,8 +2,8 @@ h1 {
   color: #0592af;
 }
 
-video {
-  /* display: none; */
+video, #markersCanvas {
+  display: none;
 }
 
 #canvasOutput {
